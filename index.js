@@ -33,6 +33,7 @@ app.use(appMiddleware)
      //verify token
  const data =jwt.verify(token,'supersecretket123')
  console.log(data);
+ req.currentAcno=data.currentAcno
  next()}
  
  catch{
@@ -67,7 +68,7 @@ app.use(appMiddleware)
 //Deposit API
 app.post('/deposit',jwtMiddleware,(req,res)=>{
     // deposit solvoing asynchronus
-    dataService.deposit(req.body.acno,req.body.password,req.body.amt)
+    dataService.deposit(req,req.body.acno,req.body.password,req.body.amt)
     .then(result=>{
         res.status(result.statusCode).json(result)
     })   
@@ -77,7 +78,7 @@ app.post('/deposit',jwtMiddleware,(req,res)=>{
 //Withdraw API
 app.post('/withdraw',jwtMiddleware,(req,res)=>{
     // deposit solvoing
-     dataService.withdraw(req.body.acno,req.body.password,req.body.amt)
+     dataService.withdraw(req,req.body.acno,req.body.password,req.body.amt)
      .then(result=>{
         res.status(result.statusCode).json(result)   
      
@@ -92,6 +93,16 @@ app.post('/transaction',jwtMiddleware,(req,res)=>{
         res.status(result.statusCode).json(result)   
      
 })   
+
+})
+///deleteAcc API
+app.delete('/deleteAcc/:acno',jwtMiddleware,(req,res)=>{
+     // delete solvoing
+     dataService.deleteAcc(req.params.acno)
+     .then(result=>{
+         res.status(result.statusCode).json(result)   
+      
+ })   
 
 })
 

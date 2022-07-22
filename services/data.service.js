@@ -76,13 +76,20 @@ console.log(user);
 }
 
   //deposit api
-   const deposit=(acno,password,amt)=>{
+   const deposit=(req,acno,password,amt)=>{
     var amount = parseInt(amt)
      return db.User.findOne({
        acno,
        password
      }).then(user=>{
       if(user){
+        if(acno!=req.currentAcno){
+          return {
+            status:false,
+            message:"Permission Denied",
+            statusCode:401
+        }
+      }
         user.balance +=amount
         user.transaction.push({
           type:"CREDIT",
@@ -109,13 +116,20 @@ console.log(user);
      })
     }
   //Withdraw API
-   const withdraw =(acno,password,amt)=>{
+   const withdraw =(req,acno,password,amt)=>{
     var amount = parseInt(amt)
     return db.User.findOne({
       acno,
       password
     }).then(user=>{
       if(user){
+        if(acno!=req.currentAcno){
+          return {
+            status:false,
+            message:"Permission Denied",
+            statusCode:401
+          }
+        }
        if(user.balance>amount){
         user.balance-=amount
         user.transaction.push({
@@ -169,9 +183,29 @@ console.log(user);
          }
        }
      })
+    }
+     //delete
+     const deleteAcc=(acno)=>{
+      return db.User.deleteOne({
+        acno
+      }).then(user=>{
+        if(!user){
+          return{
+            status:false,
+          message:"operation failed",
+          statusCode:401
+          }
+        }
+        return{
+          status:true,
+          statusCode:200,
+          message:"Succesfully deleted"
+        }
+      })
+     }
      
   
-  }
+  
  
   
   //EXPORT
@@ -181,5 +215,6 @@ console.log(user);
       login,
       deposit,
       withdraw,
-      getTransaction
+      getTransaction,
+      deleteAcc
   }
